@@ -1,0 +1,16 @@
+package com.sap.bnb.calc
+
+import com.sap.bnb.bn.{Flip, Sure}
+import org.scalatest.{FunSuite, Matchers}
+
+class SplitterTest extends FunSuite with Matchers {
+
+  val alarm2john = Map(true -> Flip(.9), false -> Flip(.05))
+  val alarm2mary = Map(true -> Flip(.7), false -> Flip(.01))
+  test("both posteriors") {
+    val withVals = Splitter(alarm2john, alarm2mary).prior(Flip(.1)).posterior(Flip(0), Flip(1))
+    val withoutVals = Splitter(alarm2john, alarm2mary).prior(Flip(.1)).posterior(false, true)
+    assert(withVals.chances(true) === (.45 +- .01))
+    assert(withVals.chances(true) - withoutVals.chances(true) < .02)
+  }
+}
