@@ -27,7 +27,6 @@ nohup.out
 .project
 .ruleset
 .springBeans
-license*.lic
 .gradle/
 GoogleNews-vectors-negative300.bin
 /ui/node_modules
