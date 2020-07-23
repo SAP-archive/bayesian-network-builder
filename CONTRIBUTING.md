@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2020 Giancarlo Frison <giancarlo.frison@sap.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 # How to Contribute
 
 This project is [Bayesian Network Builder](https://github.com/sap/bayesian-network-builder) - Everybody is welcome to contribute! To make your contribution a success, please take a look at the following guidelines.

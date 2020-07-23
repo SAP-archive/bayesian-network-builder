@@ -1,3 +1,4 @@
+
 Bayesian Network Builder - Probabilistic Programming made Easy
 =====
 
@@ -109,3 +110,6 @@ If you're interested please check these two important documents:
 ## Contact
 
 Contact me under [Giancarlo Frison](mailto:giancarlo.frison@sap.com)
+
+SPDX-FileCopyrightText: 2020 Giancarlo Frison <giancarlo.frison@sap.com>
+SPDX-License-Identifier: Apache-2.0

@@ -1,6 +1,11 @@
+/*
+ * SPDX-FileCopyrightText: 2020 Giancarlo Frison <giancarlo.frison@sap.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.sap.bnb.calc
 
-import com.sap.bnb.bn.{Flip, Sure}
+import com.sap.bnb.bn.Flip
 import org.scalatest.{FunSuite, Matchers}
 
 class SplitterTest extends FunSuite with Matchers {

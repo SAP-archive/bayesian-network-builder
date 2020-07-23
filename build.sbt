@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2020 Giancarlo Frison <giancarlo.frison@sap.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 import Dependencies._
 
 ThisBuild / scalaVersion := "2.13.3"
