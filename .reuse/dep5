@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: bayesian-network-builder
 Upstream-Contact: Giancarlo Frison <giancarlo.frison@sap.com>
-Source: 
+Source: https://github.com/sap/bayesian-network-builder
 
 # Sample paragraph, commented out:
 #
