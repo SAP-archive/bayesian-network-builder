@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2020 Giancarlo Frison <giancarlo.frison@sap.com>
+ * SPDX-FileCopyrightText: SAP SE or an SAP affiliate company and bayesian-network-builder contributors
  *
  * SPDX-License-Identifier: Apache-2.0
  */
