@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2020 Giancarlo Frison <giancarlo.frison@sap.com>
+ * SPDX-FileCopyrightText: SAP SE or an SAP affiliate company and bayesian-network-builder contributors
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -57,6 +57,9 @@ The Definition-of-Done criteria for this project are:
 * Peer review process established
 * Dependencies identified and integrated into build pipeline
 
+## Developer Certificate of Origin (DCO)
+
+Due to legal reasons, contributors will be asked to accept a DCO before they submit the first pull request to this projects, this happens in an automated fashion during the submission process. SAP uses [the standard DCO text of the Linux Foundation](https://developercertificate.org/).
 
 ## Communication Channels
 
