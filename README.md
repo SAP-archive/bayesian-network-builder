@@ -111,5 +111,5 @@ If you're interested please check these two important documents:
 
 Contact me under [Giancarlo Frison](mailto:giancarlo.frison@sap.com)
 
-SPDX-FileCopyrightText: SAP SE or an SAP affiliate company and bayesian-network-builder contributors
+SPDX-FileCopyrightText: 2020 SAP SE or an SAP affiliate company and bayesian-network-builder contributors
 SPDX-License-Identifier: Apache-2.0
