@@ -12,11 +12,13 @@ import scala.collection.MultiDict
 import scala.util.DynamicVariable
 
 /**
- * @author Giancarlo Frison <giancarlo.frison@sap.com>
- */
+  * @author Giancarlo Frison <giancarlo.frison@sap.com>
+  */
 object dsl {
 
-  private val ws: DynamicVariable[MultiDict[String, Any]] = new DynamicVariable(null)
+  private val ws: DynamicVariable[MultiDict[String, Any]] = new DynamicVariable(
+    null
+  )
 
   def druid(body: => Any) = {
     ws.withValue(MultiDict[String, Any]()) {
@@ -40,22 +42,23 @@ object dsl {
     def ~[A, B](clauses: (A, BE[B])*) = new Line[A, B](node, clauses)
 
     def <~[A, B, C](a1: String, a2: String, cpt: ((_, _), BE[_])*): Unit = {
-      val cptm = cpt.map(t => (t._1._1, t._1._2) -> t._2.asInstanceOf[BE[Any]]).toMap
+      val cptm =
+        cpt.map(t => (t._1._1, t._1._2) -> t._2.asInstanceOf[BE[Any]]).toMap
       pimpName(node, From((a1, a2, cptm)))
       pimpName(a1, To((cptm, a2, node)))
       pimpName(a2, To((cptm, a1, node)))
     }
   }
 
-
   class Line[A, B](node: String, clauses: Seq[(A, BE[B])]) {
 
-    def ~>(target: String) = new {
-      pimpName(node, To((clauses.toMap, target)))
-      pimpName(target, From((node, clauses.toMap)))
+    def ~>(target: String) =
+      new {
+        pimpName(node, To((clauses.toMap, target)))
+        pimpName(target, From((node, clauses.toMap)))
 
-      def ~[A, B](clauses2: (A, BE[B])*) = new Line[A, B](target, clauses2)
-    }
+        def ~[A, B](clauses2: (A, BE[B])*) = new Line[A, B](target, clauses2)
+      }
   }
 
   class To[T](val value: T)

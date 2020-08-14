@@ -44,7 +44,8 @@ class dslTest extends FunSuite with Matchers {
     val a = druid {
       "ciao" ~ (true -> Flip(.9), false -> Flip(.2)) ~> "riciao"
     }
-    val ret: Option[BE[Boolean]] = a.evidences("ciao" -> true).solve("riciao").value
+    val ret: Option[BE[Boolean]] =
+      a.evidences("ciao" -> true).solve("riciao").value
     ret.map(_.chances(true)).get should be > .8
   }
   test("posterior single") {
@@ -52,14 +53,16 @@ class dslTest extends FunSuite with Matchers {
       "ciao" <~ Flip(.1)
       "ciao" ~ (true -> Flip(.9), false -> Flip(.2)) ~> "riciao"
     }
-    val ret: Option[BE[Boolean]] = a.evidences("riciao" -> true).solve("ciao").value
+    val ret: Option[BE[Boolean]] =
+      a.evidences("riciao" -> true).solve("ciao").value
     ret.map(_.chances(true)).get should be(.33 +- .01)
   }
   test("posterior single prior as evidence") {
     val a = druid {
       "ciao" ~ (true -> Flip(.9), false -> Flip(.2)) ~> "riciao"
     }
-    val ret: Option[BE[Boolean]] = a.evidences("ciao" -> Flip(.1), "riciao" -> true).solve("ciao").value
+    val ret: Option[BE[Boolean]] =
+      a.evidences("ciao" -> Flip(.1), "riciao" -> true).solve("ciao").value
     ret.map(_.chances(true)).get should be(.33 +- .01)
   }
   test("collider") {
@@ -67,10 +70,10 @@ class dslTest extends FunSuite with Matchers {
       "burglar" <~ Flip(.001)
       "earthquake" <~ Flip(.002)
       "alarm" <~ ("burglar", "earthquake",
-        (true, true) -> Flip(.95),
-        (true, false) -> Flip(.94),
-        (false, true) -> Flip(.29),
-        (false, false) -> Flip(.001))
+      (true, true) -> Flip(.95),
+      (true, false) -> Flip(.94),
+      (false, true) -> Flip(.29),
+      (false, false) -> Flip(.001))
     }
     val alarm = a.solve[Boolean]("alarm").value.get
     alarm.chances(true) should be(.0025 +- .0001)
@@ -80,13 +83,16 @@ class dslTest extends FunSuite with Matchers {
       "burglar" <~ Flip(.001)
       "earthquake" <~ Flip(.002)
       "alarm" <~ ("burglar", "earthquake",
-        (true, true) -> Flip(.95),
-        (true, false) -> Flip(.94),
-        (false, true) -> Flip(.29),
-        (false, false) -> Flip(.001))
+      (true, true) -> Flip(.95),
+      (true, false) -> Flip(.94),
+      (false, true) -> Flip(.29),
+      (false, false) -> Flip(.001))
     }
-    val burglar = a.evidences("alarm" -> true, "earthquake" -> false)
-      .solve[Boolean]("burglar").value.get
+    val burglar = a
+      .evidences("alarm" -> true, "earthquake" -> false)
+      .solve[Boolean]("burglar")
+      .value
+      .get
     burglar.chances(true) should be(.45 +- .01)
   }
   test("john prior") {
@@ -94,10 +100,10 @@ class dslTest extends FunSuite with Matchers {
       "burglar" <~ Flip(.001)
       "earthquake" <~ Flip(.002)
       "alarm" <~ ("burglar", "earthquake",
-        (true, true) -> Flip(.95),
-        (true, false) -> Flip(.94),
-        (false, true) -> Flip(.29),
-        (false, false) -> Flip(.001))
+      (true, true) -> Flip(.95),
+      (true, false) -> Flip(.94),
+      (false, true) -> Flip(.29),
+      (false, false) -> Flip(.001))
       "alarm" ~ (true -> Flip(.9), false -> Flip(.05)) ~> "john"
       "alarm" ~ (true -> Flip(.7), false -> Flip(.01)) ~> "mary"
     }
@@ -109,7 +115,8 @@ class dslTest extends FunSuite with Matchers {
       "a" <~ Flip(.9)
       "a" ~ (true -> Flip(.1), false -> Flip(.9)) ~> "b"
     }
-    val posterior: Option[BE[Boolean]] = a.evidences("b" -> Flip(.9)).solve("a").value
+    val posterior: Option[BE[Boolean]] =
+      a.evidences("b" -> Flip(.9)).solve("a").value
     posterior shouldBe defined
     println(posterior.get)
     posterior.get.chances(true) should be(.54 +- .01)
@@ -119,18 +126,24 @@ class dslTest extends FunSuite with Matchers {
       "burglar" <~ Flip(.001)
       "earthquake" <~ Flip(.002)
       "alarm" <~ ("burglar", "earthquake",
-        (true, true) -> Flip(.95),
-        (true, false) -> Flip(.94),
-        (false, true) -> Flip(.29),
-        (false, false) -> Flip(.001))
+      (true, true) -> Flip(.95),
+      (true, false) -> Flip(.94),
+      (false, true) -> Flip(.29),
+      (false, false) -> Flip(.001))
       "alarm" ~ (true -> Flip(.9), false -> Flip(.05)) ~> "john"
       "alarm" ~ (true -> Flip(.7), false -> Flip(.01)) ~> "mary"
     }
-    val burglar = graph.evidences("john" -> true, "mary" -> true)
-      .solve[Boolean]("burglar").value.get
+    val burglar = graph
+      .evidences("john" -> true, "mary" -> true)
+      .solve[Boolean]("burglar")
+      .value
+      .get
     burglar.chances(true) should be(.28 +- .01)
-    val burglar2 = graph.evidences("john" -> true, "mary" -> false)
-      .solve[Boolean]("burglar").value.get
+    val burglar2 = graph
+      .evidences("john" -> true, "mary" -> false)
+      .solve[Boolean]("burglar")
+      .value
+      .get
     burglar2.chances(true) should be(.005 +- .001)
 
     println("chances burglary: " + f"${burglar2.chances(true) * 100}%2.1f%%")

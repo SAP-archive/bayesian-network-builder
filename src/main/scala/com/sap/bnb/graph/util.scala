@@ -6,8 +6,8 @@
 package com.sap.bnb.graph
 
 /**
- * @author Giancarlo Frison <giancarlo.frison@sap.com>
- */
+  * @author Giancarlo Frison <giancarlo.frison@sap.com>
+  */
 object util {
 
   implicit class OptT2[A, B](t: (Option[A], Option[B])) {

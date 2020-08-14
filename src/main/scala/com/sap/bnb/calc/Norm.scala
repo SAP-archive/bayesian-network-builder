@@ -6,8 +6,8 @@
 package com.sap.bnb.calc
 
 /**
- * @author Giancarlo Frison <giancarlo.frison@sap.com>
- */
+  * @author Giancarlo Frison <giancarlo.frison@sap.com>
+  */
 object Norm {
   def apply(ds: Array[Double]): Seq[Double] = apply(ds.toSeq)
 

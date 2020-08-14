@@ -5,14 +5,13 @@
  */
 package com.sap.bnb.calc
 
-
 /**
- * Normalized Ranks
- * norm = (log(x) - log(min))/ (log(max) - log(min))
- * range 0 / 1
- *
- * @author Giancarlo Frison <giancarlo.frison@sap.com>
- */
+  * Normalized Ranks
+  * norm = (log(x) - log(min))/ (log(max) - log(min))
+  * range 0 / 1
+  *
+  * @author Giancarlo Frison <giancarlo.frison@sap.com>
+  */
 class NormRanks[T](it: Iterable[T])(implicit n: Numeric[T]) {
 
   import n._
@@ -25,5 +24,6 @@ class NormRanks[T](it: Iterable[T])(implicit n: Numeric[T]) {
 }
 
 object NormRanks {
-  def apply[T](it: Iterable[T])(implicit n: Numeric[T]): NormRanks[T] = new NormRanks(it)
+  def apply[T](it: Iterable[T])(implicit n: Numeric[T]): NormRanks[T] =
+    new NormRanks(it)
 }
