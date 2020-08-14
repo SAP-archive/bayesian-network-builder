@@ -12,19 +12,19 @@ import org.scalatest.{FunSuite, Matchers}
 class dslTest extends FunSuite with Matchers {
 
   test("dsl") {
-    val a: DSLGraph = druid {
+    val a: DSLGraph = graph {
       "ciao" <~ Flip(.2)
     }
     assert(a.priors.values.head.chances(true) === .2)
   }
   test("leaves") {
-    val a = druid {
+    val a = graph {
       "begin" ~ (true -> Flip(.2)) ~> "end"
     }
     assert(a.nodes.keySet === Set("begin", "end"))
   }
   test("cases") {
-    val a = druid {
+    val a = graph {
       "begin" ~ (true -> Flip(.2), false -> Flip(.9)) ~> "end"
     }
     println(a.cases)
@@ -32,7 +32,7 @@ class dslTest extends FunSuite with Matchers {
     assert(a.cases("end") === Set(true, false))
   }
   test("deduce single") {
-    val a = druid {
+    val a = graph {
       "ciao" <~ Flip(.9)
       "ciao" ~ (true -> Flip(.9), false -> Flip(.2)) ~> "riciao"
     }
@@ -41,7 +41,7 @@ class dslTest extends FunSuite with Matchers {
     res.map(_.chances(true)).get should be > .8
   }
   test("deduce single no posterior") {
-    val a = druid {
+    val a = graph {
       "ciao" ~ (true -> Flip(.9), false -> Flip(.2)) ~> "riciao"
     }
     val ret: Option[BE[Boolean]] =
@@ -49,7 +49,7 @@ class dslTest extends FunSuite with Matchers {
     ret.map(_.chances(true)).get should be > .8
   }
   test("posterior single") {
-    val a = druid {
+    val a = graph {
       "ciao" <~ Flip(.1)
       "ciao" ~ (true -> Flip(.9), false -> Flip(.2)) ~> "riciao"
     }
@@ -58,7 +58,7 @@ class dslTest extends FunSuite with Matchers {
     ret.map(_.chances(true)).get should be(.33 +- .01)
   }
   test("posterior single prior as evidence") {
-    val a = druid {
+    val a = graph {
       "ciao" ~ (true -> Flip(.9), false -> Flip(.2)) ~> "riciao"
     }
     val ret: Option[BE[Boolean]] =
@@ -66,7 +66,7 @@ class dslTest extends FunSuite with Matchers {
     ret.map(_.chances(true)).get should be(.33 +- .01)
   }
   test("collider") {
-    val a = druid {
+    val a = graph {
       "burglar" <~ Flip(.001)
       "earthquake" <~ Flip(.002)
       "alarm" <~ ("burglar", "earthquake",
@@ -79,7 +79,7 @@ class dslTest extends FunSuite with Matchers {
     alarm.chances(true) should be(.0025 +- .0001)
   }
   test("collider posterior") {
-    val a = druid {
+    val a = graph {
       "burglar" <~ Flip(.001)
       "earthquake" <~ Flip(.002)
       "alarm" <~ ("burglar", "earthquake",
@@ -96,7 +96,7 @@ class dslTest extends FunSuite with Matchers {
     burglar.chances(true) should be(.45 +- .01)
   }
   test("john prior") {
-    val a = druid {
+    val a = graph {
       "burglar" <~ Flip(.001)
       "earthquake" <~ Flip(.002)
       "alarm" <~ ("burglar", "earthquake",
@@ -111,7 +111,7 @@ class dslTest extends FunSuite with Matchers {
     john.chances(true) should be(.052 +- .001)
   }
   test("simple posterior") {
-    val a = druid {
+    val a = graph {
       "a" <~ Flip(.9)
       "a" ~ (true -> Flip(.1), false -> Flip(.9)) ~> "b"
     }
@@ -122,7 +122,7 @@ class dslTest extends FunSuite with Matchers {
     posterior.get.chances(true) should be(.54 +- .01)
   }
   test("john posterior") {
-    val graph = druid {
+    val g = graph {
       "burglar" <~ Flip(.001)
       "earthquake" <~ Flip(.002)
       "alarm" <~ ("burglar", "earthquake",
@@ -133,13 +133,13 @@ class dslTest extends FunSuite with Matchers {
       "alarm" ~ (true -> Flip(.9), false -> Flip(.05)) ~> "john"
       "alarm" ~ (true -> Flip(.7), false -> Flip(.01)) ~> "mary"
     }
-    val burglar = graph
+    val burglar = g
       .evidences("john" -> true, "mary" -> true)
       .solve[Boolean]("burglar")
       .value
       .get
     burglar.chances(true) should be(.28 +- .01)
-    val burglar2 = graph
+    val burglar2 = g
       .evidences("john" -> true, "mary" -> false)
       .solve[Boolean]("burglar")
       .value

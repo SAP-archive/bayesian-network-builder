@@ -20,7 +20,7 @@ object dsl {
     null
   )
 
-  def druid(body: => Any) = {
+  def graph(body: => Any) = {
     ws.withValue(MultiDict[String, Any]()) {
       body
       DSLGraph(ws.value.keySet.map(k => (k, ws.value.get(k).toSet)).toMap)
