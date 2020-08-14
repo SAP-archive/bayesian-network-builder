@@ -40,9 +40,10 @@ Considering that:
 ![Burglary](docs/burglary.jpg)
 ```scala
 import com.sap.bnb.bn._
+import com.sap.bnb.dsl
 import com.sap.bnb.dsl._
 
-val graph = druid {
+val g = graph {
  "burglar" <~ Flip(.001)
  "earthquake" <~ Flip(.002)
  "alarm" <~ ("burglar", "earthquake",
@@ -53,7 +54,7 @@ val graph = druid {
   "alarm" ~ (true -> Flip(.9), false -> Flip(.05)) ~> "JohnCalls"
   "alarm" ~ (true -> Flip(.7), false -> Flip(.01)) ~> "MaryCalls"
 }
-val burglar = graph.evidences("JohnCalls" -> true, "MaryCalls" -> false)
+val burglar = g.evidences("JohnCalls" -> true, "MaryCalls" -> false)
       .solve("burglar").value.get
 println(s"posterior: $burglar")
 println("chances burglary: " + f"${burglar.chances(true) * 100}%2.1f%%")
@@ -69,7 +70,7 @@ chances burglary: 0,6%
 ```scala
 import com.sap.bnb.bn._
 import com.sap.bnb.dsl._
-  val day1 = druid {
+  val day1 = graph {
     "high humidity" ~ (true -> Flip(.7), false -> Flip(.3)) ~> "high pressure"
     "high pressure" ~ (true -> Cards("sunny" -> .8, "rainy" -> .2), 
         false -> Cards("sunny" -> .2, "rainy" -> .8)) ~> "weather"
