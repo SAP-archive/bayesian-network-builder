@@ -1,5 +1,5 @@
 
-Bayesian Network Builder - Probabilistic Programming made Easy
+![](docs/logo.png ) Bayesian Network Builder - Probabilistic Programming made Easy
 =====
 
 # Random Variables
