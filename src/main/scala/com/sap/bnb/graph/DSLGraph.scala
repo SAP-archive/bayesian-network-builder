@@ -12,8 +12,9 @@ import com.sap.bnb.dsl.{From, To}
   * @author Giancarlo Frison <giancarlo.frison@sap.com>
   */
 object DSLGraph {
-  def apply(dict: Map[String, Set[Any]]) = {
+  def apply(dict: Map[String, Set[Any]], dictFuture: Map[String, Set[Any]]) = {
     val (nodes, priors) = GraphTransformer(dict)
+    val (nodesFuture, _) = GraphTransformer(dictFuture)
     //map all variables types
     val cases: Map[String, Set[Any]] =
       dict.foldLeft(Map.empty[String, Set[Any]]) {
@@ -29,89 +30,128 @@ object DSLGraph {
             case x: BE[Any] => (node, x.chances.keySet)
           }.toMap
       }
-    new DSLGraph(nodes, cases, priors, _ => None)
+    new DSLGraph(nodes, nodesFuture, cases, () => priors)
   }
 }
 
 /**
   * @param nodes  graph's nodes
   * @param cases  mapping of values of all random variables
-  * @param priors prior values
+  * @param priorsF prior values
   */
 class DSLGraph(
     val nodes: Map[String, BNode],
+    val nodesFuture: Map[String, BNode],
     val cases: Map[String, Set[Any]],
-    val priors: CPT1[String, Any],
-    previous: String => Option[BE[Any]]
+    val priorsF: () => CPT1[String, Any]
 ) {
 
-  /**
-    * returns calculated values of forward probability
-    */
-  val deduce: (String, CPT1[String, Any]) => CPT1[String, Any] =
-    (name, session) =>
-      session.get(name) match {
-        case Some(_) => session
-        case None =>
-          nodes(name).source
-            .flatMap(s =>
-              s(sub => session.get(sub).orElse(deduce(sub, session).get(sub)))
-            )
-            .map(newValue => session + ((name, newValue)))
-            .getOrElse(session)
-      }
+  class Solver[T](
+      val entries: Map[String, BNode],
+      val priors: CPT1[String, Any]
+  ) {
 
-  /**
-    * returns only a list of calculated posteriors (inverse probability)
-    */
-  val induce: (String, CPT1[String, Any], Set[String]) => Map[String, BE[Any]] =
-    (nodeName, session, evidences) => {
-      nodes(nodeName).posterior match {
-        case Some(posterior) => {
-          val children =
-            posterior.ends().flatMap(induce(_, session, evidences)).toMap
-          posterior(end =>
-            children
-              .get(end)
-              .orElse(deduce(end, session).get(end))
-          )
-            .map(v => children + (nodeName -> v))
-            .getOrElse(children)
+    /**
+      * returns calculated values of forward probability
+      */
+    val deduce: (String, CPT1[String, Any]) => CPT1[String, Any] =
+      (name, session) =>
+        session.get(name) match {
+          case Some(_) => session
+          case None =>
+            entries(name).source
+              .flatMap(s =>
+                s(sub => session.get(sub).orElse(deduce(sub, session).get(sub)))
+              )
+              .map(newValue => session + ((name, newValue)))
+              .getOrElse(session)
         }
-        case None => Map.empty
-      }
+
+    /**
+      * returns only a list of calculated posteriors (inverse probability)
+      */
+    val induce
+        : (String, CPT1[String, Any], Set[String]) => Map[String, BE[Any]] =
+      (nodeName, session, memoization) =>
+        if (memoization.contains(nodeName)) Map.empty
+        else {
+          entries(nodeName).posterior match {
+            case Some(posterior) => {
+              val children =
+                posterior
+                  .ends()
+                  .flatMap(induce(_, session, memoization + nodeName))
+                  .toMap
+              posterior(end =>
+                children
+                  .get(end)
+                  .orElse(deduce(end, session).get(end))
+              )
+                .map(v => children + (nodeName -> v))
+                .getOrElse(children)
+            }
+            case None => Map.empty
+          }
+        }
+    def apply(
+        toSolve: String,
+        evidences: CPT1[String, Any]
+    ) = {
+      // solve all elements in the network
+      nodes.keys.foldLeft(priors ++ evidences)((acc, name) => {
+        val forwardValues = deduce(name, acc)
+        val posteriors = induce(name, forwardValues, Set.empty)
+        forwardValues ++ posteriors
+      })
     }
+  }
+
+  protected def solveIntern[T](
+      toSolve: String,
+      evidences: CPT1[String, Any]
+  ): Iteration[T] = {
+    val priors = priorsF()
+    val solver = new Solver[T](nodes, priors)
+    val post: Map[String, BE[Any]] =
+      solver(toSolve, evidences)
+
+    val futSolv =
+      new Solver[T](
+        nodes ++ nodesFuture,
+        Map.empty
+      ) //, name => solver(name,evidences).get(name))
+    val futuresF = () =>
+      nodesFuture
+        .filter(_._2.posterior.isEmpty)
+        .keys
+        .map(futureName => {
+          (futureName, futSolv(futureName, post - futureName)(futureName))
+        })
+        .toMap
+    Iteration[T](
+      post.get(toSolve).map(_.asInstanceOf[BE[T]]),
+      new DSLGraph(
+        nodes,
+        nodesFuture,
+        cases,
+        () => (priors ++ futuresF()) - toSolve
+      )
+    )
+  }
 
   def solve[T](toSolve: String): Iteration[T] =
-    Iteration(
-      value = deduce(toSolve, priors).get(toSolve).map(_.asInstanceOf[BE[T]]),
-      next = new DSLGraph(nodes, cases, priors, solve(_).value)
-    )
-
-  def evidences(evidences: (String, Any)*) =
+    solveIntern[T](toSolve, Map.empty)
+  def evidences(evidences: (String, Any)*) = {
     new {
-      val evs: Map[String, BE[Any]] = evidences.map {
+      val evs = evidences.map {
         case (name: String, x: BE[Any]) => (name, x)
         case (name: String, x: Any)     => (name, Sure(x, cases(name)))
       }.toMap
 
-      def solve[T](toSolve: String): Iteration[T] = {
-        val forwardValues = deduce(toSolve, priors ++ evs)
-        val posteriors = induce(toSolve, forwardValues, evs.keySet)
-        val result =
-          (forwardValues ++ posteriors).get(toSolve).asInstanceOf[Option[BE[T]]]
-        Iteration(
-          result,
-          new DSLGraph(
-            nodes,
-            cases,
-            forwardValues ++ posteriors,
-            solve(_).value
-          )
-        )
-      }
+      def solve[T](toSolve: String): Iteration[T] = solveIntern[T](toSolve, evs)
 
     }
+  }
 
   case class Iteration[T](value: Option[BE[T]], next: DSLGraph)
 

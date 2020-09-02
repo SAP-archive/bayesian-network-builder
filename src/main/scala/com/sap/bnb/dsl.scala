@@ -16,19 +16,30 @@ import scala.util.DynamicVariable
   */
 object dsl {
 
+  private val temporal: DynamicVariable[MultiDict[String, Any]] =
+    new DynamicVariable(
+      null
+    )
   private val ws: DynamicVariable[MultiDict[String, Any]] = new DynamicVariable(
     null
   )
 
   def graph(body: => Any) = {
-    ws.withValue(MultiDict[String, Any]()) {
-      body
-      DSLGraph(ws.value.keySet.map(k => (k, ws.value.get(k).toSet)).toMap)
-    }
+    temporal.value = MultiDict[String, Any]()
+    ws.value = MultiDict[String, Any]()
+    body
+
+    val t = temporal.value.keySet.map(k => (k, temporal.value.get(k).toSet))
+    val value = ws.value.keySet.map(k => (k, ws.value.get(k).toSet))
+    DSLGraph(value.toMap, t.toMap)
   }
 
-  private def pimpName(name: String, obj: Any) = {
-    ws.value = ws.value.concat(MultiDict(name -> obj))
+  private def pimpName(
+      dict: DynamicVariable[MultiDict[String, Any]],
+      name: String,
+      obj: Any
+  ) = {
+    dict.value = dict.value.concat(MultiDict(name -> obj))
   }
 
   implicit def dslName(arg: String) = new DSL(arg)
@@ -36,7 +47,7 @@ object dsl {
   class DSL(node: String) {
 
     def <~(prior: BE[_]): Unit = {
-      pimpName(node, prior)
+      pimpName(ws, node, prior)
     }
 
     def ~[A, B](clauses: (A, BE[B])*) = new Line[A, B](node, clauses)
@@ -44,18 +55,25 @@ object dsl {
     def <~[A, B, C](a1: String, a2: String, cpt: ((_, _), BE[_])*): Unit = {
       val cptm =
         cpt.map(t => (t._1._1, t._1._2) -> t._2.asInstanceOf[BE[Any]]).toMap
-      pimpName(node, From((a1, a2, cptm)))
-      pimpName(a1, To((cptm, a2, node)))
-      pimpName(a2, To((cptm, a1, node)))
+      pimpName(ws, node, From((a1, a2, cptm)))
+      pimpName(ws, a1, To((cptm, a2, node)))
+      pimpName(ws, a2, To((cptm, a1, node)))
     }
   }
 
   class Line[A, B](node: String, clauses: Seq[(A, BE[B])]) {
 
+    def ~~>(target: String) =
+      new {
+        pimpName(temporal, node, To((clauses.toMap, target)))
+        pimpName(temporal, target, From((node, clauses.toMap)))
+
+        def ~[A, B](clauses2: (A, BE[B])*) = new Line[A, B](target, clauses2)
+      }
     def ~>(target: String) =
       new {
-        pimpName(node, To((clauses.toMap, target)))
-        pimpName(target, From((node, clauses.toMap)))
+        pimpName(ws, node, To((clauses.toMap, target)))
+        pimpName(ws, target, From((node, clauses.toMap)))
 
         def ~[A, B](clauses2: (A, BE[B])*) = new Line[A, B](target, clauses2)
       }

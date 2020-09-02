@@ -70,23 +70,19 @@ chances burglary: 0,6%
 ```scala
 import com.sap.bnb.bn._
 import com.sap.bnb.dsl._
-  val day1 = graph {
-    "high humidity" ~ (true -> Flip(.7), false -> Flip(.3)) ~> "high pressure"
-    "high pressure" ~ (true -> Cards("sunny" -> .8, "rainy" -> .2), 
-        false -> Cards("sunny" -> .2, "rainy" -> .8)) ~> "weather"
-    "weather" ~ ("sunny" -> Flip(.1), "rainy" -> Flip(.7)) ~> "high humidity"
-  }.evidences("high pressure" -> Flip(.9)).solve("weather")
- 
-  println(s"weather day1:${day1.value}")
-  val day2 = day1.next.solve("weather")
-  println(s"weather day2:${day2.value}")
-  val day3 = day2.next.solve("weather")
-  println(s"weather day3:${day3.value}")
+    val g = graph {
+      "highPressure" ~ (true -> Flip(.9), false -> Flip(.2)) ~> "sunny"
+      "sunny" ~ (true -> Flip(.05), false -> Flip(.8)) ~> "highHumidity"
+      "highHumidity" ~ (true -> Flip(.2), false -> Flip(.9)) ~~> "highPressure"
+    }
+    val w1 = g.evidences("highPressure" -> true).solve[Boolean]("sunny")
+    println("sunny day 1: " + f"${w1.value.get.chances(true) * 100}#2.1f%%") 
+    val w2 = w1.next.solve[Boolean]("sunny")
+    println("sunny day 2: " + f"${w2.value.get.chances(true) * 100}#2.1f%%") 
 ```
 ```
-weather day1:rainy->.26, sunny->.74
-weather day2:rainy->.56, sunny->.44
-weather day3:rainy->.52, sunny->.48
+sunny day 1: 89%
+sunny day 2: 76%
 ```
 
 ## Get Started

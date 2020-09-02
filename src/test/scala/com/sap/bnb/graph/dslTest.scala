@@ -15,7 +15,7 @@ class dslTest extends FunSuite with Matchers {
     val a: DSLGraph = graph {
       "ciao" <~ Flip(.2)
     }
-    assert(a.priors.values.head.chances(true) === .2)
+    assert(a.priorsF().values.head.chances(true) === .2)
   }
   test("leaves") {
     val a = graph {
@@ -147,5 +147,40 @@ class dslTest extends FunSuite with Matchers {
     burglar2.chances(true) should be(.005 +- .001)
 
     println("chances burglary: " + f"${burglar2.chances(true) * 100}%2.1f%%")
+  }
+  test("dynamic posterior") {
+    val dyng = graph {
+      "var1" ~ (true -> Flip(.1), false -> Flip(.9)) ~> "var2"
+      "var2" ~ (true -> Flip(.9), false -> Flip(.1)) ~~> "var1"
+    }
+    val ret = dyng.evidences("var1" -> true).solve[Boolean]("var2")
+    ret.value.get.chances(true) should be(.1 +- .01)
+    val r2 = ret.next.solve[Boolean]("var2")
+    r2.value.get.chances(true) should be(.75 +- .01)
+    val r3 = r2.next.solve[Boolean]("var2")
+    r3.value.get.chances(true) should be(.33 +- .01)
+  }
+  test("dynamic 2") {
+    val g = graph {
+      "flu" ~ (true -> Flip(.95), false -> Flip(.02)) ~> "fever"
+      "fever" ~ (true -> Flip(.9), false -> Flip(.05)) ~> "therm"
+      "therm" ~ (true -> Flip(.95), false -> Flip(.01)) ~> "takeAspirin"
+      "takeAspirin" ~ (true -> Flip(.05), false -> Flip(.9)) ~~> "fever"
+    }
+    val therm = g.evidences("flu" -> true).solve[Boolean]("therm")
+    therm.value.get.chances(true) should be(.85 +- .01)
+    val t2 = therm.next.solve[Boolean]("therm")
+    t2.value.get.chances(true) should be(.22 +- .01)
+  }
+  test("weather") {
+    val g = graph {
+      "highPressure" ~ (true -> Flip(.9), false -> Flip(.2)) ~> "sunny"
+      "sunny" ~ (true -> Flip(.05), false -> Flip(.8)) ~> "highHumidity"
+      "highHumidity" ~ (true -> Flip(.2), false -> Flip(.9)) ~~> "highPressure"
+    }
+    val w1 = g.evidences("highPressure" -> true).solve[Boolean]("sunny")
+    w1.value.get.chances(true) should be(.89 +- .01)
+    val w2 = w1.next.solve[Boolean]("sunny")
+    w2.value.get.chances(true) should be(.76 +- .01)
   }
 }
