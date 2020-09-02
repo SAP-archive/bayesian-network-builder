@@ -36,12 +36,13 @@ object DSLGraph {
 
 /**
   * @param nodes  graph's nodes
+  * @param nodesTemporal nodes with temporal effects
   * @param cases  mapping of values of all random variables
   * @param priorsF prior values
   */
 class DSLGraph(
     val nodes: Map[String, BNode],
-    val nodesFuture: Map[String, BNode],
+    val nodesTemporal: Map[String, BNode],
     val cases: Map[String, Set[Any]],
     val priorsF: () => CPT1[String, Any]
 ) {
@@ -117,11 +118,11 @@ class DSLGraph(
 
     val futSolv =
       new Solver[T](
-        nodes ++ nodesFuture,
+        nodes ++ nodesTemporal,
         Map.empty
-      ) //, name => solver(name,evidences).get(name))
+      )
     val futuresF = () =>
-      nodesFuture
+      nodesTemporal
         .filter(_._2.posterior.isEmpty)
         .keys
         .map(futureName => {
@@ -132,7 +133,7 @@ class DSLGraph(
       post.get(toSolve).map(_.asInstanceOf[BE[T]]),
       new DSLGraph(
         nodes,
-        nodesFuture,
+        nodesTemporal,
         cases,
         () => (priors ++ futuresF()) - toSolve
       )
