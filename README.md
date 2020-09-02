@@ -1,5 +1,5 @@
 
-![](docs/logo.png | width=100) Bayesian Network Builder - Probabilistic Programming made Easy
+<img src="https://raw.githubusercontent.com/SAP/bayesian-network-builder/master/docs/logo.png" width="100"> Bayesian Network Builder - Probabilistic Programming made Easy
 =====
 
 # Random Variables
