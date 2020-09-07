@@ -2,6 +2,9 @@
 <img src="https://raw.githubusercontent.com/SAP/bayesian-network-builder/master/docs/logo.png" width="100"> Bayesian Network Builder 
 =====
 
+
+A [Bayesian Belief Network](https://en.wikipedia.org/wiki/Bayesian_network) (BBN), or simply Bayesian Network, is a statistical model used to describe the [conditional dependencies](https://en.wikipedia.org/wiki/Conditional_dependence) between different random variables.
+
 # Random Variables
 ```scala
 import com.sap.bnb.bn._
@@ -19,10 +22,6 @@ val categorical = Cards("male" -> .5,"female" -> .5)
 
 ```
 
-# Bayesian Networks
-
-A [Bayesian Belief Network](https://en.wikipedia.org/wiki/Bayesian_network) (BBN), or simply Bayesian Network, is a statistical model used to describe the [conditional dependencies](https://en.wikipedia.org/wiki/Conditional_dependence) between different random variables.
-
 # Burglary Example
 I'm at work, neighbor John calls to say my alarm is ringing, but
 neighbor Mary doesn't call. Sometimes the alarm is set off by
@@ -37,7 +36,7 @@ Considering that:
 
 - Mary likes rather loud music and sometimes misses the alarm. 
 
-![Burglary](docs/burglary.jpg)
+![Burglary](docs/alarm.png)
 ```scala
 import com.sap.bnb.bn._
 import com.sap.bnb.dsl
