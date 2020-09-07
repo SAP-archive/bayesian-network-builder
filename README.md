@@ -65,19 +65,20 @@ chances burglary: 0,6%
 ```
 
 # Dynamic Bayesian Networks
+A Dynamic Bayesian Network (DBN) is a Bayesian network (BN) which relates variables to each other over adjacent time steps. 
 ![](docs/dbn.png)
 ```scala
 import com.sap.bnb.bn._
 import com.sap.bnb.dsl._
-    val g = graph {
-      "highPressure" ~ (true -> Flip(.9), false -> Flip(.2)) ~> "sunny"
-      "sunny" ~ (true -> Flip(.05), false -> Flip(.8)) ~> "highHumidity"
-      "highHumidity" ~ (true -> Flip(.2), false -> Flip(.9)) ~~> "highPressure"
-    }
-    val w1 = g.evidences("highPressure" -> true).solve[Boolean]("sunny")
-    println("sunny day 1: " + f"${w1.value.get.chances(true) * 100}#2.1f%%") 
-    val w2 = w1.next.solve[Boolean]("sunny")
-    println("sunny day 2: " + f"${w2.value.get.chances(true) * 100}#2.1f%%") 
+val g = graph {
+  "highPressure" ~ (true -> Flip(.9), false -> Flip(.2)) ~> "sunny"
+  "sunny" ~ (true -> Flip(.05), false -> Flip(.8)) ~> "highHumidity"
+  "highHumidity" ~ (true -> Flip(.2), false -> Flip(.9)) ~~> "highPressure"
+}
+val w1 = g.evidences("highPressure" -> true).solve[Boolean]("sunny")
+println("sunny day 1: " + f"${w1.value.get.chances(true) * 100}#2.1f%%") 
+val w2 = w1.next.solve[Boolean]("sunny")
+println("sunny day 2: " + f"${w2.value.get.chances(true) * 100}#2.1f%%") 
 ```
 ```
 sunny day 1: 89%
