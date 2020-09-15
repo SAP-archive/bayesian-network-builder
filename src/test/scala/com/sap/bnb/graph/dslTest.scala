@@ -183,4 +183,13 @@ class dslTest extends FunSuite with Matchers {
     val w2 = w1.next.solve[Boolean]("sunny")
     w2.value.get.chances(true) should be(.76 +- .01)
   }
+
+  test("diapers"){
+    val g = graph {
+      "female" <~ Flip(.1)
+      "female" ~ (true -> Flip(.8), false -> Flip(.2)) ~> "buyDiapers"
+    }
+    val f = g.evidences("buyDiapers"->true).solve[Boolean]("female")
+    println(f)
+  }
 }

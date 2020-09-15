@@ -39,7 +39,6 @@ Considering that:
 ![Burglary](docs/alarm.png)
 ```scala
 import com.sap.bnb.bn._
-import com.sap.bnb.dsl
 import com.sap.bnb.dsl._
 
 val g = graph {
