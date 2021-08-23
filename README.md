@@ -2,6 +2,7 @@
 <img src="https://raw.githubusercontent.com/SAP/bayesian-network-builder/master/docs/logo.png" width="100"> Bayesian Network Builder 
 =====
 
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP/bayesian-network-builder)](https://api.reuse.software/info/github.com/SAP/bayesian-network-builder)
 
 A [Bayesian Belief Network](https://en.wikipedia.org/wiki/Bayesian_network) (BBN), or simply Bayesian Network, is a statistical model used to describe the [conditional dependencies](https://en.wikipedia.org/wiki/Conditional_dependence) between different random variables.
 
@@ -107,5 +108,6 @@ If you're interested please check these two important documents:
 
 Contact me under [Giancarlo Frison](mailto:giancarlo.frison@sap.com)
 
-SPDX-FileCopyrightText: 2020 SAP SE or an SAP affiliate company and bayesian-network-builder contributors
-SPDX-License-Identifier: Apache-2.0
+## Licensing 
+
+Copyright 2020-2021 SAP SE or an SAP affiliate company and bayesian-network-builder contributors. Please see our [LICENSE](LICENSE) for copyright and license information. Detailed information including third-party components and their licensing/copyright information is available [via the REUSE tool](https://api.reuse.software/info/github.com/SAP/bayesian-network-builder).
