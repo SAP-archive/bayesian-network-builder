@@ -106,7 +106,7 @@ If you're interested please check these two important documents:
 
 ## Contact
 
-Contact me under [Giancarlo Frison](mailto:giancarlo.frison@sap.com)
+Contact me under [Giancarlo Frison](https://gfrison.com)
 
 ## Licensing 
 
