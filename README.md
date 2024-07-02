@@ -1,8 +1,14 @@
+## Important Notice
+
+This public repository is read-only and no longer maintained.
+
+![](https://img.shields.io/badge/STATUS-NOT%20CURRENTLY%20MAINTAINED-red.svg?longCache=true&style=flat)
+
+---
+
 
 <img src="https://raw.githubusercontent.com/SAP/bayesian-network-builder/master/docs/logo.png" width="100"> Bayesian Network Builder 
 =====
-
-[![REUSE status](https://api.reuse.software/badge/github.com/SAP/bayesian-network-builder)](https://api.reuse.software/info/github.com/SAP/bayesian-network-builder)
 
 A [Bayesian Belief Network](https://en.wikipedia.org/wiki/Bayesian_network) (BBN), or simply Bayesian Network, is a statistical model used to describe the [conditional dependencies](https://en.wikipedia.org/wiki/Conditional_dependence) between different random variables.
 
